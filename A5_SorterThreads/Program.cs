@@ -6,13 +6,17 @@ namespace A5_SorterThreads {
 		static void Main() {
 			Console.Title = "SorterThreads";
 
-			Console.WriteLine("Щоб закiнчити програму, натиснiть Return.");
-
 			Thread t1 = new(AscendingSort);
-			t1.Start();
 			Thread t2 = new(DescendingSort);
+			t1.Start();
 			t2.Start();
 
+			t1.Join();
+			t2.Join();
+
+			while(Console.KeyAvailable)
+				Console.ReadKey();
+			Console.WriteLine("Роботу програми завершено. Натиснiть Return, щоб продовжити...");
 			while(Console.ReadKey(true).Key != ConsoleKey.Enter) { }
 		}
 

@@ -5,40 +5,46 @@ using System.Threading;
 namespace A8_FindPrimes {
 	class Program {
 		static void Main() {
-			int cpus = Environment.ProcessorCount;
-			List<int>[] ranges = new List<int>[cpus];
-			Thread[] threads = new Thread[cpus];
-			int range = 0;
+			Console.Title = "FindPrimes";
+
 			const int range_offset = 20000;
+			int cpus = Environment.ProcessorCount;
+			Console.WriteLine($"Пошук простих чисел у дiапазонi [0; {range_offset * cpus})...");
+
+			ranges = new (List<int>, Thread)[cpus];
+			int range = 0;
 			for(int i = 0;i < cpus;i++) {
-				ranges[i] = new List<int>();
-				threads[i] = new Thread(FindPrimes) {
+				ranges[i].range = new List<int>();
+				ranges[i].thread = new Thread(FindPrimes) {
 					Priority = ThreadPriority.Lowest
 				};
-				threads[i].Start(new PrimeFinder(ranges[i], range, range + range_offset));
+				ranges[i].thread.Start(new PrimeFinder(ranges[i].range, range, range + range_offset));
 				range += range_offset;
 			}
 
-		Loop:
-			Thread.Sleep(1);
-			foreach(Thread thread in threads)
-				if(thread.IsAlive)
-					goto Loop;
-
-			foreach(List<int> list in ranges)
+			int count = 0;
+			foreach((var list, var thread) in ranges) {
+				thread.Join();  // Чекати, поки потік не завершить свою роботу.
+				count += list.Count;
 				foreach(int i in list)
 					Console.Write($"{i},");
+			}
 			Console.WriteLine();
+			Console.WriteLine($"Всього було знайдено {count} простих чисел.");
+
 			while(Console.KeyAvailable)
-				Console.ReadKey(true);
-			Console.ReadKey(true);
+				Console.ReadKey();
+			Console.WriteLine("Роботу програми завершено. Натиснiть Return, щоб продовжити...");
+			while(Console.ReadKey(true).Key != ConsoleKey.Enter) { }
 		}
+
+		static (List<int> range, Thread thread)[] ranges;
 
 		static int GcdOf(int x, int y) {
 			if(x < 1)
 				throw new ArgumentOutOfRangeException(nameof(x));
 			if(y < 1)
-				throw new ArgumentOutOfRangeException(nameof(y));
+				throw new ArgumentOutOfRangeException(nameof(x));
 			while(x != y) {
 				if(x < y)
 					y -= x;
@@ -58,37 +64,31 @@ namespace A8_FindPrimes {
 			}
 		}
 		static bool IsPrime(int number) {
+			if(number == int.MinValue)
+				return false;
 			number = Math.Abs(number);
 			if(number < 2)
 				return false;
 			if(number == 2)
 				return true;
-			if((number & 1) == 0)
-				return false;
 			int bound = (int)Math.Sqrt(number);
-			for(int i = 3;i<=bound;i += 2) {
-				if(GcdOf(i, number) != 1)
-					return false;
+			int i = 1;
+			foreach((var list, var thread) in ranges) {
+				if(Thread.CurrentThread.ManagedThreadId != thread.ManagedThreadId && thread.IsAlive)
+					break;
+				foreach(int prime in list) {
+					i = prime;
+					if(i > bound)
+						return true;
+					if(GcdOf(i, number) != 1)
+						return false;
+				}
 			}
+			do {
+				if(GcdOf(++i, number) != 1)
+					return false;
+			} while(i <= bound);
 			return true;
-		}
-	}
-
-	class PrimeFinder {
-		public IList<int> List {
-			get;
-		}
-		public int RangeBegin {
-			get;
-		}
-		public int RangeEnd {
-			get;
-		}
-
-		public PrimeFinder(IList<int> list, int rangeBegin, int rangeEnd) {
-			List = list;
-			RangeBegin = rangeBegin;
-			RangeEnd = rangeEnd;
 		}
 	}
 }

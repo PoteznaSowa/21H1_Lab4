@@ -6,7 +6,8 @@ namespace A6_Hurdling {
 		static void Main() {
 			Console.Title = "Hurdling";
 
-			int rnum = random.Next(5, 21);
+			// Кількість бігунів.
+			int rnum = random.Next(2, 100);
 
 			Console.WriteLine($"У змаганнi беруть участь {rnum} бiгунiв.");
 			Console.WriteLine($"Довжина траси {_tracklen}. Ймовiрнiсть перешкод 1%.");
@@ -17,10 +18,18 @@ namespace A6_Hurdling {
 				runners[i] = new Thread(Run);
 				runners[i].Start(i + 1);
 			}
+
+			foreach(Thread t in runners)
+				t.Join();
+
+			while(Console.KeyAvailable)
+				Console.ReadKey();
+			Console.WriteLine("Роботу програми завершено. Натиснiть Return, щоб продовжити...");
+			while(Console.ReadKey(true).Key != ConsoleKey.Enter) { }
 		}
 
 		static readonly Random random = new();
-		static readonly int _tracklen = random.Next(100000);
+		static readonly int _tracklen = random.Next(10000);
 		static readonly object _conlock = new();
 
 		static void Run(object num) {

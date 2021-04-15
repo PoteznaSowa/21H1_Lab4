@@ -14,16 +14,20 @@ namespace A3_FibAndPrimes {
 			bool fib_checked = false;
 			bool prime_checked = false;
 			do {
-				Thread.Sleep(1);
-				if(!fib.IsAlive && !fib_checked) {
+				if(fib.Join(1) && !fib_checked) {
 					fib_checked = true;
 					PrintFibonacci();
 				}
-				if(!prime.IsAlive && !prime_checked) {
+				if(prime.Join(1) && !prime_checked) {
 					prime_checked = true;
 					PrintPrimes();
 				}
 			} while(!fib_checked || !prime_checked);
+
+			while(Console.KeyAvailable)
+				Console.ReadKey();
+			Console.WriteLine("Роботу програми завершено. Натиснiть Return, щоб продовжити...");
+			while(Console.ReadKey(true).Key != ConsoleKey.Enter) { }
 		}
 		static void PrintFibonacci() {
 			Console.WriteLine("Список чисел Фiбоначчi в дiапазонi [0; 2^64):");
