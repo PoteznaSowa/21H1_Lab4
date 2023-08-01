@@ -6,7 +6,6 @@ namespace A6_Hurdling {
 		static void Main() {
 			Console.Title = "Hurdling";
 
-			// Кількість бігунів.
 			int rnum = random.Next(2, 100);
 
 			Console.WriteLine($"У змаганнi беруть участь {rnum} бiгунiв.");
@@ -37,7 +36,7 @@ namespace A6_Hurdling {
 
 			for(int i = _tracklen;i != 0;i--) {
 				int rnd;
-				lock(random)  // Генератор випадкових чисел не є thread-safe.
+				lock(random)
 					rnd = random.Next();
 				if(rnd < bound)
 					Thread.Sleep(1);
