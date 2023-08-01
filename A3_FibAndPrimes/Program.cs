@@ -75,11 +75,9 @@ namespace A3_FibAndPrimes {
 				a = b;
 				b = c;
 				try {
-					// Перевіряти обчислення на переповнення.
 					c = checked(a + b);
 					writer.WriteLine(c);
 				} catch {
-					// Переповнення — завершити цикл.
 					break;
 				}
 			}
@@ -102,7 +100,7 @@ namespace A3_FibAndPrimes {
 				return false;
 			number = Math.Abs(number);
 			if(number is 0 or 1)
-				return false;  // Числа 0 та 1 не є простими.
+				return false;
 			int bound = (int)Math.Sqrt(number);
 			for(int i = 2;i <= bound;i++)
 				if(number % i == 0)
