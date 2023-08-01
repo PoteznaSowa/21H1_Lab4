@@ -41,7 +41,7 @@ namespace A1_Graphs {
 			Delegate plotpoint_r = new PlotPoint(PlotPointAtRight);
 			Delegate plotpoint_l = new PlotPoint(PlotPointAtLeft);
 
-			const double step = 1;  // Повинен бути 1/2^n.
+			const double step = 1;
 			const double width = 1920;
 
 			if(double.IsFinite(f(0))) {
@@ -63,14 +63,12 @@ namespace A1_Graphs {
 		void PlotPointAtLeft(Polyline graph, Point point) => graph.Points.Insert(0, point);
 
 		void Window_Loaded(object sender, RoutedEventArgs e) {
-			// Запустити наші графіки.
 			ThreadPool.QueueUserWorkItem<(Polyline, Polyline, Func<double, double>)>(DrawGraph, (Graph1, Graph1, GraphFunc1), true);
 			ThreadPool.QueueUserWorkItem<(Polyline, Polyline, Func<double, double>)>(DrawGraph, (Graph2, Graph2, GraphFunc2), true);
 			ThreadPool.QueueUserWorkItem<(Polyline, Polyline, Func<double, double>)>(DrawGraph, (Graph3, Graph3_L, GraphFunc3), true);
 		}
 
 		void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
-			// Після зміни розміру вікна треба вирівняти наші графіки посередині вікна.
 			double h_half = GraphCanvas.ActualHeight / 2;
 			double w_half = GraphCanvas.ActualWidth / 2;
 			Canvas.SetTop(Graph1, h_half);
